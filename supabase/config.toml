@@ -246,6 +246,13 @@ otp_expiry = 3600
 # admin_email = "admin@email.com"
 # sender_name = "Admin"
 
+# E-mail de "Esqueci minha senha": o link aponta para /auth/confirmar do próprio app
+# (token_hash, que também abre em outro aparelho). Em produção, o mesmo texto vai em
+# Authentication > Emails > Reset password (ver README).
+[auth.email.template.recovery]
+subject = "Fruteira Iracema: crie uma nova senha"
+content_path = "./supabase/templates/recuperar-senha.html"
+
 # Uncomment to customize email template
 # [auth.email.template.invite]
 # subject = "You have been invited"

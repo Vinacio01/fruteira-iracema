@@ -200,7 +200,7 @@ O usuário achou o visual anterior feio. Entre três direções (etiqueta de fei
 
 ## Minha conta: trocar a senha (pedido do usuário)
 
-- Escolhido "trocar senha estando logado" antes de "esqueci minha senha": a recuperação por e-mail depende do envio de e-mails do Supabase Auth (limite baixo no serviço padrão; para uso real, ligar ao Resend por SMTP) e fica para depois.
+- Escolhido "trocar senha estando logado" antes de "esqueci minha senha": a recuperação por e-mail depende do envio de e-mails do Supabase Auth (limite baixo no serviço padrão; para uso real, ligar ao Resend por SMTP) e ficou para a etapa seguinte (abaixo).
 - **Tela `/conta` para os dois papéis**, aberta pelo nome do usuário no rodapé do menu. Configurações continua só do proprietário.
 - **Exige a senha atual**: quem achar o computador com a sessão aberta não troca a senha. A senha atual é conferida numa **conexão à parte** (sem cookies), para não mexer na sessão aberta; a sessão criada por essa conferência é encerrada em seguida. A troca usa `auth.updateUser` com a sessão do usuário.
 - **Mínimo de 8 caracteres** (o mesmo do `supabase/config.toml`, validado também no servidor com Zod, para valer igual em produção) e no máximo 72 (limite do bcrypt).
@@ -210,3 +210,18 @@ O usuário achou o visual anterior feio. Entre três direções (etiqueta de fei
 ## Histórico do estoque
 
 - **O histórico mostra a movimentação recém-registrada**: o botão "+ Estoque" da lista abre a tela filtrada no produto, e trocar o produto no formulário deixava a movimentação nova escondida pelo filtro antigo (parecia que saídas e ajustes não eram gravados). Agora, se o filtro de produto, tipo ou período a esconderia, ele passa a mostrar o produto que acabou de ser movimentado.
+
+## Esqueci minha senha (pedido do usuário)
+
+Para quem não sabe a senha atual, "Minha conta" não ajuda: a recuperação é por e-mail.
+
+- **Fluxo**: link "Esqueci minha senha" no login → `/esqueci-senha` (pede o e-mail) → o Supabase envia um e-mail → o link abre `/auth/confirmar` → `/redefinir-senha` (senha nova e confirmação) → volta ao login com aviso.
+- **Link com `token_hash`, não o fluxo PKCE padrão**: o PKCE só funciona no mesmo navegador que pediu a recuperação, e o dono costuma pedir no computador e abrir o e-mail no celular. O `token_hash` (verificado no servidor com `verifyOtp`) funciona em qualquer aparelho. Custo: o texto do e-mail de recuperação precisa apontar para `/auth/confirmar`; o modelo está em `supabase/templates/recuperar-senha.html` (usado pelo Supabase local via `config.toml`) e precisa ser colado no painel do Supabase de produção (README).
+- **A tela de senha nova só aceita sessão nascida do link**: o token do Supabase registra como a sessão começou (`amr`: `otp` quando veio do e-mail), e o servidor exige isso, com até 30 minutos desde o clique. Sem essa conferência, quem encontrasse um computador já logado trocaria a senha por `/redefinir-senha` sem saber a atual (para isso existe "Minha conta", que pede a atual).
+- **Depois de trocar, todas as sessões são encerradas** (`signOut` global) e a pessoa entra de novo: quem pede recuperação pode ter perdido um aparelho.
+- **Não revela quem tem cadastro**: a resposta é a mesma para e-mail conhecido ou desconhecido (o Supabase já se comporta assim). Só o limite de pedidos seguidos mostra um aviso próprio.
+- **Contas da demonstração (`@demo-iracema.test`) não recebem e-mail nem trocam a senha** (a senha delas é pública), bloqueado no servidor.
+- **Link vale uma vez e por 1 hora**; link usado, vencido ou adulterado volta para o pedido com um aviso claro.
+- **Formulários sem `action={...}` direto**: o React limpa os campos de um formulário após a ação; como a tela de senha nova deve manter o que foi digitado quando há erro, o envio é feito por `onSubmit` + `startTransition` (igual a Minha conta).
+- Limitação conhecida: antivírus ou leitores de e-mail corporativos que "abrem" links para verificar podem gastar o link antes do usuário. Pedir outro resolve.
+- Testes: validações no Vitest; fluxo completo no Playwright lendo o e-mail no Mailpit do Supabase local (link, senha nova, antiga deixa de valer, link não vale duas vezes, e-mail desconhecido sem e-mail enviado, demo bloqueada, sessão comum recusada na tela de senha nova, link adulterado).

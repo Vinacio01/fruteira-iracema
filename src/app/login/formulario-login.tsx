@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState, useRef } from "react";
 import { Loader2 } from "lucide-react";
 
@@ -20,11 +21,13 @@ export type ContaDemo = {
 
 type Props = {
   aviso?: string;
+  /** Confirmação positiva (ex.: senha redefinida). */
+  sucesso?: string;
   /** Só chega preenchido na demo pública (ver `DEMO_MODE` em `.env.example`). */
   contasDemo?: ContaDemo[];
 };
 
-export function FormularioLogin({ aviso, contasDemo = [] }: Props) {
+export function FormularioLogin({ aviso, sucesso, contasDemo = [] }: Props) {
   const [estado, acao, pendente] = useActionState(entrar, estadoInicial);
   const mensagem = estado.erro ?? aviso;
   const formulario = useRef<HTMLFormElement>(null);
@@ -54,7 +57,15 @@ export function FormularioLogin({ aviso, contasDemo = [] }: Props) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="senha">Senha</Label>
+        <div className="flex items-baseline justify-between">
+          <Label htmlFor="senha">Senha</Label>
+          <Link
+            href="/esqueci-senha"
+            className="text-xs text-muted-foreground underline underline-offset-4 hover:text-foreground"
+          >
+            Esqueci minha senha
+          </Link>
+        </div>
         <Input
           id="senha"
           name="senha"
@@ -67,6 +78,10 @@ export function FormularioLogin({ aviso, contasDemo = [] }: Props) {
       {mensagem ? (
         <p role="alert" className="text-sm text-destructive">
           {mensagem}
+        </p>
+      ) : sucesso ? (
+        <p role="status" className="text-sm font-medium text-titulo">
+          {sucesso}
         </p>
       ) : null}
 

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
-import { SeloIracema } from "@/components/selo-iracema";
+import { CartaoAutenticacao } from "@/components/cartao-autenticacao";
 import { destinoInicial, obterSessao } from "@/lib/services/sessao";
 
 import { FormularioLogin, type ContaDemo } from "./formulario-login";
@@ -40,19 +40,19 @@ export default async function PaginaLogin({ searchParams }: PageProps<"/login">)
       ? "Seu usuário está desativado. Fale com o proprietário."
       : undefined;
 
+  const sucesso =
+    motivo === "senha-redefinida" ? "Senha redefinida. Entre com a nova senha." : undefined;
+
   return (
-    <main className="flex min-h-svh flex-col items-center justify-center gap-8 bg-folha p-4">
-      <SeloIracema tamanho="grande" />
-      <div className="w-full max-w-sm rounded-xl bg-card p-6 shadow-lg">
-        <h1 className="font-display text-4xl leading-none font-extrabold text-titulo">Entrar</h1>
-        <p className="mt-1 mb-5 text-sm text-muted-foreground">
-          Use o e-mail e a senha que o proprietário cadastrou para você.
-        </p>
-        <FormularioLogin
-          aviso={aviso}
-          contasDemo={process.env.DEMO_MODE === "true" ? CONTAS_DEMO : []}
-        />
-      </div>
-    </main>
+    <CartaoAutenticacao
+      titulo="Entrar"
+      descricao="Use o e-mail e a senha que o proprietário cadastrou para você."
+    >
+      <FormularioLogin
+        aviso={aviso}
+        sucesso={sucesso}
+        contasDemo={process.env.DEMO_MODE === "true" ? CONTAS_DEMO : []}
+      />
+    </CartaoAutenticacao>
   );
 }

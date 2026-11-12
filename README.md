@@ -135,13 +135,24 @@ O e-mail que **recebe** os alertas não é variável de ambiente: o proprietári
    where id = (select id from auth.users where email = 'email-do-dono@exemplo.com');
    ```
 
-### 2. App (Vercel)
+### 2. E-mail de "Esqueci minha senha" (Supabase)
+
+O Supabase envia esse e-mail, não o app. Antes de entregar para o uso real:
+
+1. **Authentication > URL Configuration**: **Site URL** com o endereço da Vercel (o link do e-mail usa ele).
+2. **Authentication > Emails > SMTP Settings**: ligue um SMTP próprio (o [Resend](https://resend.com) serve, com a mesma conta dos alertas). O envio padrão do Supabase é só para testes: limite muito baixo e só entrega para a equipe do projeto.
+3. **Authentication > Emails > Templates > Reset password**: cole o conteúdo de `supabase/templates/recuperar-senha.html` e use o assunto "Fruteira Iracema: crie uma nova senha". O link do modelo (`/auth/confirmar?token_hash=...`) é o que o app entende.
+4. Cada usuário precisa de um **e-mail real**. Contas da demonstração (`@demo-iracema.test`) não recebem e-mail de recuperação.
+
+Localmente nada disso é preciso: os e-mails caem no Mailpit, em http://127.0.0.1:54324.
+
+### 3. App (Vercel)
 
 1. Em [vercel.com](https://vercel.com), **Add New > Project** e importe este repositório do GitHub (o framework Next.js é detectado sozinho).
 2. Cadastre as seis variáveis de ambiente da tabela acima, com os valores de **produção** (em *Project Settings > API Keys* do Supabase).
 3. **Deploy.** O cron de alertas (`vercel.json`) é registrado automaticamente.
 
-### 3. Depois do primeiro deploy
+### 4. Depois do primeiro deploy
 
 - Entre como proprietário e, em **Configurações**, ligue os alertas e defina o e-mail de destino.
 - Para a demonstração, rode `supabase/seed-demo.sql` no SQL Editor (ver abaixo).
@@ -237,7 +248,7 @@ Testes de ponta a ponta (navegador de verdade, com o Supabase local rodando):
 npm run test:e2e
 ```
 
-Cobrem a venda pelo código de barras, o caixa sem internet (a venda não se perde nem duplica), produto sem estoque, o funcionário barrado nas telas do proprietário e o cancelamento com estorno.
+Cobrem a venda pelo código de barras, a troca e a recuperação de senha por e-mail (lendo o e-mail no Mailpit), o caixa sem internet (a venda não se perde nem duplica), produto sem estoque, o funcionário barrado nas telas do proprietário e o cancelamento com estorno.
 
 O **CI** (`.github/workflows/ci.yml`) roda a cada push: sobe um Supabase do zero, aplica as migrations, confere que os tipos do banco batem com elas e roda lint, tipos, testes, build e os testes de ponta a ponta. Nenhum segredo de produção é usado.
 

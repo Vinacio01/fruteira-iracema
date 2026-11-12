@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { diaEmSaoPaulo, diaSeguinte, inicioDoDiaEmSaoPaulo } from "@/lib/format";
 import { contemTermos } from "@/lib/texto";
-import { esquemaTrocaSenha } from "@/lib/validations/auth";
+import { esquemaEsqueciSenha, esquemaRedefinirSenha, esquemaTrocaSenha } from "@/lib/validations/auth";
 import { normalizarDinheiro } from "@/lib/validations/comum";
 import { esquemaMovimentacao } from "@/lib/validations/estoque";
 import { esquemaFiltrosProdutos, esquemaNovoProduto } from "@/lib/validations/produtos";
@@ -142,5 +142,34 @@ describe("esquemaTrocaSenha", () => {
 
   it("recusa nova senha igual à atual", () => {
     expect(campoComErro({ ...base, nova_senha: "senha-antiga", confirmacao: "senha-antiga" })).toBe("nova_senha");
+  });
+});
+
+describe("esquemaEsqueciSenha", () => {
+  it("normaliza o e-mail", () => {
+    expect(esquemaEsqueciSenha.parse({ email: "  Dono@Mercadinho.TEST " }).email).toBe("dono@mercadinho.test");
+  });
+
+  it("recusa e-mail inválido", () => {
+    expect(esquemaEsqueciSenha.safeParse({ email: "sem-arroba" }).success).toBe(false);
+  });
+});
+
+describe("esquemaRedefinirSenha", () => {
+  const campoComErro = (dados: { nova_senha: string; confirmacao: string }) => {
+    const r = esquemaRedefinirSenha.safeParse(dados);
+    return r.success ? null : r.error.issues[0]?.path[0];
+  };
+
+  it("aceita senha nova com confirmação igual, sem pedir a atual", () => {
+    expect(esquemaRedefinirSenha.safeParse({ nova_senha: "senha-nova-123", confirmacao: "senha-nova-123" }).success).toBe(true);
+  });
+
+  it("exige pelo menos 8 caracteres", () => {
+    expect(campoComErro({ nova_senha: "curta12", confirmacao: "curta12" })).toBe("nova_senha");
+  });
+
+  it("recusa confirmação diferente", () => {
+    expect(campoComErro({ nova_senha: "senha-nova-123", confirmacao: "outra" })).toBe("confirmacao");
   });
 });

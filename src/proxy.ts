@@ -2,7 +2,8 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { atualizarSessao } from "@/lib/supabase/middleware";
 
-const ROTAS_PUBLICAS = ["/login"];
+/** /auth/confirmar recebe o link do e-mail de recuperação, de quem ainda não tem sessão. */
+const ROTAS_PUBLICAS = ["/login", "/esqueci-senha", "/auth/confirmar"];
 
 /**
  * Roda antes de cada página:
