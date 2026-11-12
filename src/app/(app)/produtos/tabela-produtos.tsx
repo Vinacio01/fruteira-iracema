@@ -18,10 +18,38 @@ import type { ProdutoLista } from "@/lib/services/produtos";
 type Props = {
   produtos: ProdutoLista[];
   ehProprietario: boolean;
+  /** Há busca ou filtro aplicado: lista vazia significa "nada bate", não "catálogo vazio". */
+  filtrando: boolean;
 };
 
 /** Tabela de produtos. As colunas de custo só existem para o proprietário. */
-export function TabelaProdutos({ produtos, ehProprietario }: Props) {
+export function TabelaProdutos({ produtos, ehProprietario, filtrando }: Props) {
+  if (produtos.length === 0 && !filtrando) {
+    return (
+      <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed py-12 text-center">
+        <PackageSearch className="size-8 text-muted-foreground" />
+        <p className="font-medium">Você ainda não tem produtos</p>
+        <p className="max-w-sm text-sm text-muted-foreground">
+          {ehProprietario
+            ? "Cadastre o primeiro produto com preço e quantidade em estoque. Depois é só vender no caixa."
+            : "O proprietário ainda não cadastrou produtos. Assim que ele cadastrar, eles aparecem aqui."}
+        </p>
+        {ehProprietario ? (
+          <div className="flex flex-wrap justify-center gap-2">
+            <Button asChild>
+              <Link href="/produtos/novo">
+                <Plus /> Cadastrar o primeiro produto
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link href="/produtos/categorias">Criar categorias antes</Link>
+            </Button>
+          </div>
+        ) : null}
+      </div>
+    );
+  }
+
   if (produtos.length === 0) {
     return (
       <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed py-12 text-center">

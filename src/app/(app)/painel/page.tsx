@@ -5,12 +5,15 @@ import { CabecalhoPagina } from "@/components/cabecalho-pagina";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { calcularPeriodos, PERIODOS, ROTULO_PERIODO } from "@/lib/periodos";
 import { obterIndicadores } from "@/lib/services/indicadores";
+import { obterPrimeirosPassos } from "@/lib/services/primeiros-passos";
 import { exigirProprietario } from "@/lib/services/sessao";
 import { ROTULO_FORMA } from "@/lib/validations/vendas";
 
+import { AssistenteInicial } from "./assistente-inicial";
 import { BlocoFinanceiro } from "./bloco-financeiro";
 import { CardsIndicadores } from "./cards-indicadores";
 import { GraficoBarras, type Ponto } from "./grafico-barras";
+import { PrimeirosPassos } from "./primeiros-passos";
 import { SeletorPeriodo } from "./seletor-periodo";
 
 export const metadata: Metadata = { title: "Painel" };
@@ -55,14 +58,17 @@ function CardGrafico({
 }
 
 export default async function PaginaPainel({ searchParams }: PageProps<"/painel">) {
-  await exigirProprietario();
+  const usuario = await exigirProprietario();
 
   const { periodo: bruto } = await searchParams;
   const periodo = z.enum(PERIODOS).catch("mes").parse(Array.isArray(bruto) ? bruto[0] : bruto);
   const periodos = calcularPeriodos(periodo);
   const rotuloPeriodo = ROTULO_PERIODO[periodo];
 
-  const indicadores = await obterIndicadores(periodos);
+  const [indicadores, passos] = await Promise.all([
+    obterIndicadores(periodos),
+    obterPrimeirosPassos(),
+  ]);
 
   const porDia: Ponto[] = indicadores.porDia.map((d) => ({
     ...rotulosDoDia(d.dia),
@@ -94,6 +100,13 @@ export default async function PaginaPainel({ searchParams }: PageProps<"/painel"
         descricao="Vendas canceladas não entram em nenhum número."
         acoes={<SeletorPeriodo periodo={periodo} />}
       />
+
+      {/* Loja sem nenhum produto: o assistente leva o dono até o primeiro cadastro. */}
+      {passos.some((p) => p.id === "produtos" && !p.feito) ? (
+        <AssistenteInicial usuarioId={usuario.id} />
+      ) : null}
+
+      <PrimeirosPassos passos={passos} />
 
       <CardsIndicadores
         indicadores={indicadores}

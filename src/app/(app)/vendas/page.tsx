@@ -30,7 +30,10 @@ export default async function PaginaVendas({ searchParams }: PageProps<"/vendas"
         descricao="Histórico de vendas do caixa. Abra uma venda para ver os itens ou cancelar."
       />
       <FiltrosVendasForm filtros={filtros} />
-      <TabelaVendas vendas={vendas} />
+      <TabelaVendas
+        vendas={vendas}
+        filtrando={Boolean(filtros.de || filtros.ate || filtros.forma || filtros.status)}
+      />
       <Paginacao
         caminho="/vendas"
         parametros={{ de: filtros.de, ate: filtros.ate, forma: filtros.forma, status: filtros.status }}

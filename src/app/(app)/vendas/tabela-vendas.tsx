@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ChevronRight, Receipt } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -20,7 +21,22 @@ export function codigoVenda(id: string) {
   return id.slice(0, 8).toUpperCase();
 }
 
-export function TabelaVendas({ vendas }: { vendas: VendaLista[] }) {
+export function TabelaVendas({ vendas, filtrando }: { vendas: VendaLista[]; filtrando: boolean }) {
+  if (vendas.length === 0 && !filtrando) {
+    return (
+      <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed py-12 text-center">
+        <Receipt className="size-8 text-muted-foreground" />
+        <p className="font-medium">Ainda não há vendas registradas</p>
+        <p className="max-w-sm text-sm text-muted-foreground">
+          Cada venda feita no caixa aparece aqui, e dá para abrir e cancelar (o estoque volta sozinho).
+        </p>
+        <Button asChild>
+          <Link href="/caixa">Abrir o caixa</Link>
+        </Button>
+      </div>
+    );
+  }
+
   if (vendas.length === 0) {
     return (
       <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed py-12 text-center">

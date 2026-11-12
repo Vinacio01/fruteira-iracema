@@ -12,6 +12,7 @@ import {
   atualizarProduto,
   cadastrarProduto,
   criarCategoria,
+  listarCategorias,
 } from "@/lib/services/produtos";
 import { exigirProprietario } from "@/lib/services/sessao";
 import { errosPorCampo } from "@/lib/validations/comum";
@@ -117,6 +118,21 @@ export async function alterarSituacaoProdutoAcao(
 // -----------------------------------------------------------------------------
 // Categorias
 // -----------------------------------------------------------------------------
+
+/**
+ * Categorias ativas, para o assistente de configuração: ele cria uma categoria
+ * e, na etapa seguinte, precisa listá-la sem recarregar a página inteira.
+ */
+export async function listarCategoriasAtivasAcao(): Promise<{ id: string; nome: string }[]> {
+  await exigirProprietario();
+  try {
+    const categorias = await listarCategorias();
+    return categorias.filter((c) => c.ativo).map((c) => ({ id: c.id, nome: c.nome }));
+  } catch (erro) {
+    console.error("[listarCategoriasAtivasAcao]", erro);
+    return [];
+  }
+}
 
 export async function criarCategoriaAcao(
   _anterior: EstadoFormulario,

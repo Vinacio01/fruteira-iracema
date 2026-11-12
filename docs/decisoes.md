@@ -169,3 +169,14 @@ Sem achados graves; banco, RLS, privilégios, idempotência e fila de alertas co
 - **Bug achado pelo teste de ponta a ponta**: o aviso "Venda cancelada" nunca aparecia. A página atualizada (já cancelada) removia o diálogo antes do efeito que mostrava o aviso; agora o aviso sai direto na resposta da ação.
 - **Uso do nome e da marca**: a proprietária da Mini Mercado e Fruteira Iracema autorizou o uso do nome da loja neste projeto de portfólio. Os dados da demo são fictícios.
 - **Repositório renomeado** para `fruteira-iracema` (o nome anterior tinha acento quebrado).
+
+## Onboarding (pedido do usuário, depois da conversa com o recrutador)
+
+Escolhidas três de quatro propostas: checklist no painel, assistente de configuração e tour do caixa.
+
+- **Checklist "Primeiros passos"** no topo do painel: categorias, produtos, e-mail de alerta e primeira venda. Cada passo é **calculado do banco** (contagens e configurações), sem tabela nova, então se marca sozinho e nunca fica desatualizado. Some quando tudo está feito.
+- **Assistente de configuração**: diálogo que abre sozinho para o proprietário de uma loja **sem nenhum produto** (por isso não aparece na demo pública). Etapas: categoria, primeiro produto, e-mail de alerta. Cada etapa chama a **mesma Server Action** da tela correspondente, com a mesma validação e as mesmas permissões. Ação nova `listarCategoriasAtivasAcao` para listar a categoria recém-criada sem recarregar a página (recarregar desmontaria o assistente no meio).
+- **Tour do caixa** em três balões (busca, pagamento, F2), uma vez por usuário, com botão "Ver tour". **Não bloqueia o caixa nem tira o foco da busca**: a primeira versão bloqueava, e o teste de ponta a ponta pegou que o funcionário não conseguia escolher o pagamento; com leitor de código de barras, o Enter da primeira leitura avançaria o tour em vez de adicionar o produto.
+- **"Já vi" guardado no navegador** (`localStorage`, por usuário), não no banco: sem migration. Custo aceito: outro navegador mostra de novo. Se o navegador bloquear o armazenamento, a escolha vale até recarregar.
+- **Telas vazias com ação**: produtos, vendas e caixa distinguem "catálogo vazio" (botão para cadastrar) de "nada bate com o filtro".
+- **Botões de entrar na demo** no login, só com `DEMO_MODE=true` (variável de servidor): numa loja real as senhas da demo nunca chegam à página.

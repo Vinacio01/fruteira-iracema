@@ -63,7 +63,7 @@ export function PainelPagamento({
           </p>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2" data-tour="pagamento">
           <p className="text-sm font-medium" id="rotulo-forma">
             Forma de pagamento
           </p>
@@ -118,6 +118,7 @@ export function PainelPagamento({
           <Button
             size="lg"
             className={cn("h-12 text-base")}
+            data-tour="finalizar"
             onClick={aoFinalizar}
             disabled={!podeFinalizar}
           >

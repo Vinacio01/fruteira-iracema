@@ -63,7 +63,13 @@ export default async function PaginaProdutos({ searchParams }: PageProps<"/produ
         ehProprietario={ehProprietario}
       />
 
-      <TabelaProdutos produtos={produtos} ehProprietario={ehProprietario} />
+      <TabelaProdutos
+        produtos={produtos}
+        ehProprietario={ehProprietario}
+        filtrando={Boolean(
+          filtros.busca || filtros.categoria || filtros.estoque !== "todos" || filtros.inativos,
+        )}
+      />
 
       <Paginacao
         caminho="/produtos"

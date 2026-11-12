@@ -19,6 +19,8 @@ type PropsNome = {
   aoConcluir?: () => void;
   limparAoConcluir?: boolean;
   idCampo: string;
+  /** Foco no campo ao aparecer (usado no assistente de configuração). */
+  focarAoAbrir?: boolean;
 };
 
 /** Formulário de um campo só (nome da categoria), usado para criar e renomear. */
@@ -29,6 +31,7 @@ export function FormularioNomeCategoria({
   aoConcluir,
   limparAoConcluir = false,
   idCampo,
+  focarAoAbrir = false,
 }: PropsNome) {
   const [estado, enviar, pendente] = useActionState(acao, ESTADO_INICIAL);
   const formulario = useRef<HTMLFormElement>(null);
@@ -57,6 +60,7 @@ export function FormularioNomeCategoria({
           maxLength={60}
           placeholder="Ex.: Mercearia"
           aria-invalid={estado.campos?.nome ? true : undefined}
+          autoFocus={focarAoAbrir}
           required
         />
       </Campo>
