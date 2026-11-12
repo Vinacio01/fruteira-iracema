@@ -1,6 +1,7 @@
 "use client";
 
 import { startTransition as iniciarTransicao, useActionState, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowDownToLine, ArrowUpFromLine, Loader2, SlidersHorizontal } from "lucide-react";
 
 import { Campo } from "@/components/campo";
@@ -61,6 +62,8 @@ function estoqueDepois(tipo: TipoManual, atual: number, quantidade: number): num
 
 export function FormularioMovimentacao({ produtos, produtoInicial }: Props) {
   const [estado, enviar, pendente] = useActionState(registrarMovimentacaoAcao, ESTADO_INICIAL);
+  const router = useRouter();
+  const parametrosUrl = useSearchParams();
   const [tipo, setTipo] = useState<TipoManual>("entrada");
   const [produtoId, setProdutoId] = useState<string | null>(
     produtos.some((p) => p.id === produtoInicial) ? (produtoInicial ?? null) : null,
@@ -76,9 +79,34 @@ export function FormularioMovimentacao({ produtos, produtoInicial }: Props) {
   const previsao = produto && numero !== null ? estoqueDepois(tipo, produto.quantidade, numero) : null;
   const tipoAtual = TIPOS.find((t) => t.valor === tipo)!;
 
+  /**
+   * O histórico ao lado pode estar filtrado em outro produto (o botão
+   * "+ Estoque" da lista abre a tela já filtrada), em outro tipo ou em outro
+   * período: aí a movimentação recém-registrada não apareceria. Nesse caso o
+   * filtro passa a mostrar o produto que acabou de ser movimentado, com a linha
+   * nova no topo. O parâmetro "movimentar" fica como está, para o formulário não
+   * ser recriado.
+   */
+  function mostrarNoHistorico() {
+    if (!produtoId) return;
+    const parametros = new URLSearchParams(parametrosUrl.toString());
+    const filtroProduto = parametros.get("produto");
+    const escondida =
+      (filtroProduto !== null && filtroProduto !== produtoId) ||
+      (parametros.has("tipo") && parametros.get("tipo") !== tipo) ||
+      parametros.has("de") ||
+      parametros.has("ate");
+    if (!escondida) return;
+
+    parametros.set("produto", produtoId);
+    for (const chave of ["tipo", "de", "ate", "pagina"]) parametros.delete(chave);
+    router.replace(`/estoque?${parametros.toString()}`, { scroll: false });
+  }
+
   useResultadoAcao(estado, () => {
     setQuantidade("");
     setMotivo("");
+    mostrarNoHistorico();
   });
 
   function enviarFormulario() {
