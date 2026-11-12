@@ -50,6 +50,13 @@ Todo o código deste repositório é escrito pelo Claude Code. O desenvolvedor d
 - Não instale dependências fora da stack sem justificar.
 - Não desative mecanismos de segurança para facilitar o desenvolvimento.
 
+## Princípios de código
+
+- **Mudanças cirúrgicas:** altere só o que o pedido exige. Não refatore, reformate nem "melhore" código vizinho; se notar algo, avise em vez de mexer.
+- **Sem excesso:** não adicione funcionalidade, abstração ou configuração que não foi pedida. Se houver solução mais simples, use-a.
+- **Dúvida:** se o pedido tiver mais de uma interpretação, diga qual entendeu e pergunte antes de implementar.
+- **Verificável:** toda correção começa por um teste que reproduz o problema; só diga que está pronto depois de rodar e mostrar o resultado.
+
 ## Estado atual: em produção
 
 - As fases 0 a 8 terminaram. O app está **no ar** (Vercel + Supabase) e é usado como demonstração de portfólio. O que vier agora são melhorias sobre o que existe.
@@ -64,53 +71,16 @@ Todo o código deste repositório é escrito pelo Claude Code. O desenvolvedor d
 
 ## Stack
 
-- **Next.js** (App Router, TypeScript, Server Components e Server Actions)
-- **Supabase**: Postgres, Auth (e-mail e senha), Row Level Security e CLI para migrations
-- **@supabase/ssr** para sessão no Next.js
-- **Tailwind CSS** + **shadcn/ui** + **lucide-react** (ícones)
-- **Recharts** para gráficos
-- **Zod** para validação
-- **Resend** para envio de e-mail
-- **Vitest** para testes
-- **Vercel** para hospedagem
-- Gerenciador de pacotes: npm
-
-Use as versões estáveis atuais e siga a documentação oficial do Supabase para Next.js.
+A stack está no `package.json` (Next.js + Supabase + Tailwind/shadcn + Zod + Resend + Vitest, na Vercel). Gerenciador de pacotes: npm. Siga a documentação oficial do Supabase para Next.js.
 
 ## Organização do código
-
-```
-src/
-  app/                 rotas (login, caixa, produtos, estoque, painel, configuracoes)
-  components/          componentes visuais reutilizáveis
-  components/ui/       componentes do shadcn/ui
-  lib/supabase/        clientes do Supabase (servidor, navegador, middleware)
-  lib/services/        regras de negócio (vendas, estoque, alertas, indicadores)
-  lib/validations/     schemas Zod
-  lib/integrations/    Resend (e-mail)
-  lib/format.ts        formatação de moeda, data e fuso
-  types/               tipos TypeScript (incluindo os gerados do banco)
-supabase/
-  migrations/          SQL versionado
-  seed-demo.sql        dados de demonstração (ver seção própria)
-tests/
-```
 
 - Regras de negócio ficam em `lib/services` ou em funções do Postgres, **nunca duplicadas** em componentes.
 - Evite componentes gigantes; quebre em partes com uma responsabilidade cada.
 
 ## Variáveis de ambiente
 
-Crie um `.env.example` (sem valores reais):
-
-```
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
-RESEND_API_KEY=
-ALERTA_EMAIL_REMETENTE=
-CRON_SECRET=
-```
+A lista fica no `.env.example` (sem valores reais).
 
 - `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY` e `CRON_SECRET` só no servidor. Nunca em componente de cliente nem com prefixo `NEXT_PUBLIC_`.
 - Use a service role só onde for indispensável (ex.: processar a fila de alertas no cron).
@@ -121,73 +91,13 @@ CRON_SECRET=
 
 Migrations SQL em `supabase/migrations`. Nomes de tabelas e colunas em português, sem acentos.
 
-### `perfis`
-- `id` uuid PK, referência a `auth.users` (on delete cascade)
-- `nome` text
-- `papel` enum `papel_usuario` ('proprietario', 'funcionario'), default 'funcionario'
-- `ativo` boolean default true
+O esquema completo (tabelas, colunas, enums, índices) está nas migrations e em `src/types/database.ts`. Decisões que o código não explica sozinho:
 
-### `categorias`
-- `id` uuid PK, `nome` text único, `ativo` boolean
-
-### `produtos`
-- `id` uuid PK
-- `nome` text obrigatório
-- `descricao` text opcional
-- `categoria_id` uuid FK opcional
-- `codigo_barras` text opcional, único quando preenchido
-- `unidade` text default 'un' (un, kg, L, cx)
-- `preco_custo` numeric(10,2) ≥ 0
-- `preco_venda` numeric(10,2) > 0
-- `quantidade` integer ≥ 0
-- `estoque_minimo` integer ≥ 0, default 10
-- `ativo` boolean default true
-- `created_at`, `updated_at` timestamptz
-
-### `movimentacoes_estoque` (toda alteração de estoque passa por aqui)
-- `id` uuid PK
-- `produto_id` FK
-- `tipo` enum: 'entrada', 'saida_manual', 'venda', 'cancelamento_venda', 'ajuste'
-- `quantidade` integer (positiva; o tipo indica o sentido, exceto 'ajuste', que registra o novo total)
-- `quantidade_anterior`, `quantidade_posterior` integer
-- `usuario_id` FK `auth.users`
-- `venda_id` FK opcional
-- `motivo` text (obrigatório em saída manual e ajuste)
-- `created_at` timestamptz
-
-### `vendas`
-- `id` uuid PK
-- `chave_idempotencia` uuid **único** (gerado no navegador ao iniciar a venda; impede venda duplicada por duplo clique ou reenvio)
-- `forma_pagamento` enum: 'dinheiro', 'pix', 'debito', 'credito'
-- `total` numeric(10,2)
-- `custo_total` numeric(10,2)
-- `status` enum: 'concluida', 'cancelada'
-- `operador_id` FK `auth.users`
-- `cancelada_por`, `cancelada_em`, `motivo_cancelamento` (opcionais)
-- `created_at` timestamptz
-
-### `itens_venda`
-- `id`, `venda_id` FK (cascade), `produto_id` FK
-- `quantidade` integer > 0
-- `preco_unitario` numeric(10,2) e `custo_unitario` numeric(10,2): **cópia** dos valores do produto no momento da venda
-- `subtotal` numeric(10,2)
-
-### `alertas_estoque`
-- `id`, `produto_id` FK
-- `quantidade_no_alerta`, `estoque_minimo_no_alerta` integer
-- `status` enum: 'pendente', 'enviado', 'falhou'
-- `tentativas` integer default 0, `ultimo_erro` text, `enviado_em` timestamptz
-- `resolvido_em` timestamptz (preenchido quando o estoque é reposto acima do mínimo)
-- `created_at`
-- Índice único parcial: no máximo **um alerta aberto** (`resolvido_em is null`) por produto.
-
-### `configuracoes` (linha única)
-- `id` fixo (ex.: `1`, com check para impedir outra linha)
-- `alertas_ativos` boolean default true
-- `email_alerta` text
-
-### Índices
-Crie índices em: `produtos(codigo_barras)`, `produtos(nome)`, `vendas(created_at)`, `vendas(status)`, `itens_venda(venda_id)`, `itens_venda(produto_id)`, `movimentacoes_estoque(produto_id, created_at)`.
+- **Toda alteração de estoque passa por `movimentacoes_estoque`.** A `quantidade` é sempre positiva e o `tipo` indica o sentido, exceto `ajuste`, que registra o novo total. `motivo` é obrigatório em saída manual e ajuste.
+- **`vendas.chave_idempotencia`** (única, gerada no navegador ao iniciar a venda) impede venda duplicada por duplo clique ou reenvio.
+- **`itens_venda.preco_unitario` e `custo_unitario` são cópia** dos valores do produto no momento da venda.
+- **`alertas_estoque`**: no máximo **um alerta aberto** (`resolvido_em is null`) por produto; `resolvido_em` é preenchido quando o estoque é reposto acima do mínimo.
+- **`configuracoes`** tem uma linha só (id fixo, com check).
 
 ## Segurança
 
@@ -248,55 +158,7 @@ Função `cancelar_venda(venda_id, motivo)`: marca a venda como 'cancelada', dev
 
 Interface em português do Brasil: moderna, limpa, com sidebar, cards e boa hierarquia. Sem gradientes nem enfeites. Deve funcionar em desktop, tablet e celular, mas o caixa é pensado para desktop. Inclua estados de carregamento, mensagens de sucesso e erro (toasts) e confirmação antes de ações destrutivas.
 
-### `/login`
-E-mail e senha, sem "criar conta". Um middleware protege todas as outras rotas. Depois do login, o funcionário vai para `/caixa` e o proprietário para `/painel`.
-
-### `/caixa` (proprietário e funcionário)
-Velocidade acima de tudo:
-- Busca com foco automático, por nome ou código de barras. Código exato + Enter adiciona direto (leitor de código de barras funciona como teclado).
-- Lista da venda: produto, quantidade (+ e −), subtotal e remover.
-- Total grande, seleção da forma de pagamento, "Finalizar venda" (F2) e "Cancelar" (Esc).
-- O botão de finalizar fica desabilitado enquanto processa.
-- Depois de finalizar: confirmação curta e tela limpa com nova chave de idempotência.
-- Produto sem estoque aparece na busca, mas não pode ser adicionado.
-
-### `/produtos`
-- Tabela com busca, filtro por categoria, ordenação por quantidade e filtros rápidos "Estoque baixo" e "Sem estoque".
-- Proprietário: criar, editar e desativar produtos e gerenciar categorias. Funcionário: só consulta, sem colunas de custo.
-
-### `/estoque` (proprietário)
-- Registrar entrada, saída manual e ajuste.
-- Histórico de movimentações com filtro por produto, tipo e período.
-
-### `/vendas` (proprietário)
-- Histórico de vendas com filtro por período, forma de pagamento e status.
-- Detalhe da venda e botão "Cancelar venda" com motivo e confirmação.
-
-### `/painel` (proprietário)
-Período padrão "Este mês", com seletor: Hoje, Últimos 7 dias, Últimos 30 dias, Este mês e Mês anterior.
-
-Cards:
-1. Faturamento do dia
-2. Faturamento do período
-3. Variação contra o período anterior equivalente, em % (verde se subiu, vermelho se caiu). Em "Este mês", compare com o mês anterior **até o mesmo dia** (ex.: 1 a 3 de novembro contra 1 a 3 de outubro)
-4. Quantidade de vendas
-5. Ticket médio (faturamento ÷ vendas válidas)
-6. Produtos com estoque baixo, com link para a lista
-
-Bloco financeiro com **faturamento**, **custo das mercadorias vendidas** e **lucro bruto estimado**, rotulados assim. Nunca chame faturamento de lucro.
-
-Gráficos (Recharts):
-- Faturamento por dia no período
-- Faturamento dos últimos 6 meses
-- Top 10 produtos mais vendidos
-- Vendas por forma de pagamento
-
-**Vendas canceladas não entram em nenhum indicador.** Calcule os indicadores no banco (funções SQL ou views), não trazendo todas as vendas para o navegador.
-
-### `/configuracoes` (proprietário)
-- Ativar ou desativar alertas e definir o e-mail de destino.
-- Status da integração de e-mail (configurada ou não).
-- Lista dos últimos alertas com status e erro, mais o botão de reenviar.
+Os detalhes de cada tela ficam num `CLAUDE.md` dentro da pasta da rota (`src/app/login/`, `src/app/(app)/caixa/`, `produtos/`, `estoque/`, `vendas/`, `painel/`, `configuracoes/`) e carregam quando você trabalha nela. **Vendas canceladas não entram em nenhum indicador**, e faturamento nunca é chamado de lucro.
 
 ## Dados de demonstração
 
