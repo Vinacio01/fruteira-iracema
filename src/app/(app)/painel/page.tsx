@@ -15,6 +15,7 @@ import { CardsIndicadores } from "./cards-indicadores";
 import { GraficoBarras, type Ponto } from "./grafico-barras";
 import { PrimeirosPassos } from "./primeiros-passos";
 import { SeletorPeriodo } from "./seletor-periodo";
+import { TourPainel } from "./tour-painel";
 
 export const metadata: Metadata = { title: "Painel" };
 
@@ -69,6 +70,7 @@ export default async function PaginaPainel({ searchParams }: PageProps<"/painel"
     obterIndicadores(periodos),
     obterPrimeirosPassos(),
   ]);
+  const lojaVazia = passos.some((p) => p.id === "produtos" && !p.feito);
 
   const porDia: Ponto[] = indicadores.porDia.map((d) => ({
     ...rotulosDoDia(d.dia),
@@ -98,13 +100,18 @@ export default async function PaginaPainel({ searchParams }: PageProps<"/painel"
       <CabecalhoPagina
         titulo="Painel"
         descricao="Vendas canceladas não entram em nenhum número."
-        acoes={<SeletorPeriodo periodo={periodo} />}
+        acoes={
+          <>
+            <div data-tour="periodo">
+              <SeletorPeriodo periodo={periodo} />
+            </div>
+            <TourPainel usuarioId={usuario.id} abrirSozinho={!lojaVazia} />
+          </>
+        }
       />
 
       {/* Loja sem nenhum produto: o assistente leva o dono até o primeiro cadastro. */}
-      {passos.some((p) => p.id === "produtos" && !p.feito) ? (
-        <AssistenteInicial usuarioId={usuario.id} />
-      ) : null}
+      {lojaVazia ? <AssistenteInicial usuarioId={usuario.id} /> : null}
 
       <PrimeirosPassos passos={passos} />
 

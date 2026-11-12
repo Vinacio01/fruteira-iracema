@@ -18,14 +18,17 @@ function Indicador({
   valor,
   detalhe,
   children,
+  tour,
 }: {
   rotulo: string;
   valor?: React.ReactNode;
   detalhe?: React.ReactNode;
   children?: React.ReactNode;
+  /** Marca o card como passo do tour do painel. */
+  tour?: string;
 }) {
   return (
-    <Card className="gap-0 py-4">
+    <Card className="gap-0 py-4" data-tour={tour}>
       <CardContent className="space-y-1 px-4">
         <p className="text-sm text-muted-foreground">{rotulo}</p>
         {valor !== undefined ? <p className="numero text-3xl">{valor}</p> : null}
@@ -77,11 +80,13 @@ export function CardsIndicadores({ indicadores, descricaoAnterior, rotuloPeriodo
         detalhe={hoje.vendas === 1 ? "1 venda hoje" : `${hoje.vendas} vendas hoje`}
       />
       <Indicador
+        tour="faturamento"
         rotulo={`Faturamento · ${rotuloPeriodo}`}
         valor={formatarCentavos(atual.faturamento)}
         detalhe={`Período anterior: ${formatarCentavos(anterior.faturamento)}`}
       />
       <Indicador
+        tour="variacao"
         rotulo="Variação do faturamento"
         detalhe={
           anterior.faturamento === 0
@@ -103,6 +108,7 @@ export function CardsIndicadores({ indicadores, descricaoAnterior, rotuloPeriodo
       />
       <Link
         href="/produtos?estoque=baixo&ordem=quantidade_asc"
+        data-tour="estoque-baixo"
         className="group rounded-xl focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
       >
         <Indicador

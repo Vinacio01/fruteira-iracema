@@ -51,7 +51,7 @@ export function AppSidebar({ hrefsPermitidos, rodape }: Props) {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu data-tour="menu">
               {itens.map((item) => {
                 const ativo =
                   pathname === item.href || pathname.startsWith(`${item.href}/`);

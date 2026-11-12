@@ -190,3 +190,14 @@ O usuário achou o visual anterior feio. Entre três direções (etiqueta de fei
 - **A etiqueta** (utilitário `etiqueta` em `globals.css`): amarela, ponta recortada e furo do barbante, com texto em vermelho escuro `#8f0f16` (contraste 5,7:1). Aparece em dois lugares só, para não perder a força: o **total do caixa** e os **produtos com estoque baixo** no painel. Igual nos dois temas, como as outras cores da marca.
 - **Preços dos itens do caixa** na condensada vermelha, como a plaquinha.
 - **Tour do caixa** escurece menos o fundo (25%): ele não bloqueia, e o caixa precisa continuar legível por trás.
+
+## Tour do painel (pedido do usuário)
+
+- Escolhido entre "tour do painel" e "reabrir o assistente": o dono ganha um tour de cinco passos no painel (período, faturamento, comparação com o período anterior, estoque baixo e o menu), com o botão "Ver tour" como no caixa.
+- **Um componente só** (`components/tour.tsx`) para os dois tours: mesmo comportamento (não bloqueia, uma vez por usuário e por navegador, botão para repetir). Cada tela só declara os passos.
+- **Não abre sozinho com a loja vazia**: aí o assistente de configuração já está na tela, e os dois juntos atrapalhariam. O botão "Ver tour" continua disponível.
+- **Posição do balão**: abaixo do alvo quando cabe, senão acima; alvos na faixa da esquerda (o menu) recebem o balão **ao lado**, para não cobri-los; alvo escondido (o menu no celular) põe o balão no centro.
+
+## Histórico do estoque
+
+- **O histórico mostra a movimentação recém-registrada**: o botão "+ Estoque" da lista abre a tela filtrada no produto, e trocar o produto no formulário deixava a movimentação nova escondida pelo filtro antigo (parecia que saídas e ajustes não eram gravados). Agora, se o filtro de produto, tipo ou período a esconderia, ele passa a mostrar o produto que acabou de ser movimentado.
