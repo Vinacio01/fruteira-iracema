@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Source_Sans_3, Zilla_Slab } from "next/font/google";
+import { Big_Shoulders, Figtree, Zilla_Slab } from "next/font/google";
 
 import { ProvedorTema } from "@/components/provedor-tema";
 import { Toaster } from "@/components/ui/sonner";
@@ -7,15 +7,27 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 
 import "./globals.css";
 
-// Interface e tabelas: sans humanista, boa leitura de números.
-const sourceSans = Source_Sans_3({
+// Direção visual "Etiqueta de feira" (ver docs/decisoes.md).
+
+// Interface, formulários e tabelas: sans aberta e legível.
+const figtree = Figtree({
   variable: "--font-sans",
   subsets: ["latin"],
 });
 
-// Logo, títulos e números grandes: serifa pesada, como o "IRACEMA" da placa.
-const zillaSlab = Zilla_Slab({
+// Títulos, preços e números grandes: condensada como letreiro e plaquinha de preço.
+const bigShoulders = Big_Shoulders({
   variable: "--font-display",
+  subsets: ["latin"],
+  // O Next não tem as métricas desta fonte para gerar um substituto ajustado;
+  // enquanto ela carrega, usa uma condensada do sistema (parecida em largura).
+  adjustFontFallback: false,
+  fallback: ["Impact", "Arial Narrow", "sans-serif"],
+});
+
+// Só o selo da loja: serifa pesada, como o "IRACEMA" da placa.
+const zillaSlab = Zilla_Slab({
+  variable: "--font-marca",
   subsets: ["latin"],
   weight: ["600", "700"],
 });
@@ -33,7 +45,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     // suppressHydrationWarning: o next-themes põe a classe "dark" no <html> antes do React.
     <html
       lang="pt-BR"
-      className={`${sourceSans.variable} ${zillaSlab.variable} h-full antialiased`}
+      className={`${figtree.variable} ${bigShoulders.variable} ${zillaSlab.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full">

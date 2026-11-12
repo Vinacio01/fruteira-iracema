@@ -87,7 +87,7 @@ export function AssistenteInicial({ usuarioId }: Props) {
         {etapa === "boas-vindas" ? (
           <>
             <div className="space-y-2">
-              <DialogTitle className="font-display text-2xl text-titulo">
+              <DialogTitle className="font-display text-3xl leading-none font-extrabold text-titulo">
                 Vamos deixar a loja pronta
               </DialogTitle>
               <DialogDescription>
@@ -107,7 +107,7 @@ export function AssistenteInicial({ usuarioId }: Props) {
         {etapa === "categoria" ? (
           <>
             <div className="space-y-2">
-              <DialogTitle className="font-display text-2xl text-titulo">
+              <DialogTitle className="font-display text-3xl leading-none font-extrabold text-titulo">
                 Crie uma categoria
               </DialogTitle>
               <DialogDescription>
@@ -135,7 +135,7 @@ export function AssistenteInicial({ usuarioId }: Props) {
         {etapa === "pronto" ? (
           <>
             <div className="space-y-2">
-              <DialogTitle className="font-display text-2xl text-titulo">Tudo pronto</DialogTitle>
+              <DialogTitle className="font-display text-3xl leading-none font-extrabold text-titulo">Tudo pronto</DialogTitle>
               <DialogDescription>
                 A loja já pode vender. O painel mostra o que falta, e o caixa tem um tour rápido na
                 primeira vez que for aberto.
@@ -187,7 +187,7 @@ function EtapaProduto({ aoConcluir, aoPular }: { aoConcluir: () => void; aoPular
   return (
     <>
       <div className="space-y-2">
-        <DialogTitle className="font-display text-2xl text-titulo">
+        <DialogTitle className="font-display text-3xl leading-none font-extrabold text-titulo">
           Cadastre o primeiro produto
         </DialogTitle>
         <DialogDescription>
@@ -272,7 +272,7 @@ function EtapaAlertas({ aoConcluir, aoPular }: { aoConcluir: () => void; aoPular
   return (
     <>
       <div className="space-y-2">
-        <DialogTitle className="font-display text-2xl text-titulo">
+        <DialogTitle className="font-display text-3xl leading-none font-extrabold text-titulo">
           Receba o aviso de estoque baixo
         </DialogTitle>
         <DialogDescription>

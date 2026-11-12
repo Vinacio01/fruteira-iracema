@@ -17,7 +17,7 @@ export function SeloIracema({ tamanho = "normal", className }: Props) {
       <span
         aria-label="Fruteira Iracema"
         className={cn(
-          "flex size-8 shrink-0 items-center justify-center rounded-[50%] border-2 border-iracema bg-white font-display text-lg leading-none font-bold text-iracema",
+          "flex size-8 shrink-0 items-center justify-center rounded-[50%] border-2 border-iracema bg-white font-marca text-lg leading-none font-bold text-iracema",
           className,
         )}
       >
@@ -39,7 +39,7 @@ export function SeloIracema({ tamanho = "normal", className }: Props) {
     >
       <span
         className={cn(
-          "font-display font-semibold tracking-wide text-folha",
+          "font-marca font-semibold tracking-wide text-folha",
           grande ? "text-sm" : "text-[0.62rem] leading-tight",
         )}
       >
@@ -47,7 +47,7 @@ export function SeloIracema({ tamanho = "normal", className }: Props) {
       </span>
       <span
         className={cn(
-          "font-display leading-none font-bold tracking-wide",
+          "font-marca leading-none font-bold tracking-wide",
           grande ? "text-5xl" : "text-[1.65rem]",
         )}
       >

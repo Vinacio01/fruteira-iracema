@@ -52,13 +52,13 @@ export function PainelPagamento({
   return (
     <Card className="lg:sticky lg:top-4">
       <CardContent className="flex flex-col gap-5">
-        <div>
-          <p className="text-sm text-muted-foreground">Total</p>
-          {/* Como a placa de preço da fruteira: número grande, vermelho, em serifa. */}
-          <p className="numero text-6xl leading-none text-preco" aria-live="polite">
+        {/* O total é a plaquinha de preço da banca: amarela, com a ponta recortada. */}
+        <div className="etiqueta py-3">
+          <p className="text-sm font-semibold">Total</p>
+          <p className="numero text-6xl leading-none" aria-live="polite">
             {formatarCentavos(totalCentavos)}
           </p>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-1 text-sm font-medium">
             {unidades === 1 ? "1 unidade" : `${unidades} unidades`}
           </p>
         </div>

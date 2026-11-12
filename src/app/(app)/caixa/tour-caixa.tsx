@@ -138,11 +138,12 @@ function Balao({ passo, indice, total, aoVoltar, aoAvancar, aoEncerrar }: PropsB
             left: alvo.left - 4,
             width: alvo.width + 8,
             height: alvo.height + 8,
-            boxShadow: "0 0 0 9999px rgb(0 0 0 / 0.5)",
+            // Escurece pouco: o tour não bloqueia, e o caixa continua legível por trás.
+            boxShadow: "0 0 0 9999px rgb(0 0 0 / 0.25)",
           }}
         />
       ) : (
-        <div aria-hidden="true" className="fixed inset-0 bg-black/50" />
+        <div aria-hidden="true" className="fixed inset-0 bg-black/25" />
       )}
 
       <div

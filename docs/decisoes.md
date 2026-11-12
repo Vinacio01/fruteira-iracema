@@ -180,3 +180,13 @@ Escolhidas três de quatro propostas: checklist no painel, assistente de configu
 - **"Já vi" guardado no navegador** (`localStorage`, por usuário), não no banco: sem migration. Custo aceito: outro navegador mostra de novo. Se o navegador bloquear o armazenamento, a escolha vale até recarregar.
 - **Telas vazias com ação**: produtos, vendas e caixa distinguem "catálogo vazio" (botão para cadastrar) de "nada bate com o filtro".
 - **Botões de entrar na demo** no login, só com `DEMO_MODE=true` (variável de servidor): numa loja real as senhas da demo nunca chegam à página.
+
+## Visual "Etiqueta de feira" (substitui a rodada visual "Hortifrúti")
+
+O usuário achou o visual anterior feio. Entre três direções (etiqueta de feira, caderno do balcão, caixote de hortifrúti), escolheu a **etiqueta de feira**: a plaquinha de preço da banca.
+
+- **Fontes**: Big Shoulders (condensada de letreiro) em títulos de página, preços e números grandes; Figtree na interface e nas tabelas; a Zilla Slab fica **só no selo**, que imita a placa. Títulos pequenos (cards, diálogos) usam a sans: a condensada só funciona grande. No catálogo do Google a família agora se chama "Big Shoulders" (a antiga "Big Shoulders Display" faz parte dela).
+- **Cores**: as da marca continuam (folha, Iracema); o amarelo da etiqueta virou `#f5c518`; fundo papel `#fbfaf3` e bordas palha `#e6e0cc` no lugar dos cinzas esverdeados.
+- **A etiqueta** (utilitário `etiqueta` em `globals.css`): amarela, ponta recortada e furo do barbante, com texto em vermelho escuro `#8f0f16` (contraste 5,7:1). Aparece em dois lugares só, para não perder a força: o **total do caixa** e os **produtos com estoque baixo** no painel. Igual nos dois temas, como as outras cores da marca.
+- **Preços dos itens do caixa** na condensada vermelha, como a plaquinha.
+- **Tour do caixa** escurece menos o fundo (25%): ele não bloqueia, e o caixa precisa continuar legível por trás.

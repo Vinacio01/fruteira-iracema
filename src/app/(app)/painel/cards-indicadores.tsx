@@ -113,15 +113,15 @@ export function CardsIndicadores({ indicadores, descricaoAnterior, rotuloPeriodo
             </span>
           }
         >
-          <p
-            className={cn(
-              "flex items-center gap-2 numero text-3xl",
-              produtosEstoqueBaixo > 0 && "text-laranja-texto",
-            )}
-          >
-            {produtosEstoqueBaixo > 0 ? <PackageX className="size-6" aria-hidden="true" /> : null}
-            {produtosEstoqueBaixo.toLocaleString("pt-BR")}
-          </p>
+          {produtosEstoqueBaixo > 0 ? (
+            // Estoque baixo usa a mesma etiqueta do caixa: é o que pede atenção no painel.
+            <p className="etiqueta inline-flex w-fit items-center gap-2 py-1 numero text-3xl">
+              <PackageX className="size-6" aria-hidden="true" />
+              {produtosEstoqueBaixo.toLocaleString("pt-BR")}
+            </p>
+          ) : (
+            <p className="numero text-3xl">0</p>
+          )}
         </Indicador>
       </Link>
     </div>

@@ -9,8 +9,11 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
   --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
-  --font-heading: var(--font-display);
+  /* Títulos pequenos (cards, diálogos) ficam na sans: a condensada só funciona grande. */
+  --font-heading: var(--font-sans);
   --font-display: var(--font-display);
+  --font-marca: var(--font-marca);
+  --color-sobre-limao: var(--sobre-limao);
   --color-folha: var(--folha);
   --color-iracema: var(--iracema);
   --color-broto: var(--broto);
@@ -59,16 +62,18 @@
 }
 
 /*
- * Identidade visual da Mini Mercado e Fruteira Iracema (direção "Hortifrúti").
- * Cores da marca tiradas da placa da loja; contrastes conferidos (AA).
+ * Identidade visual da Mini Mercado e Fruteira Iracema, direção "Etiqueta de
+ * feira": a plaquinha de preço da banca. Cores da marca tiradas da placa da
+ * loja; contrastes conferidos (AA).
  *   Folha   #1f4a2c  sidebar
- *   Iracema #b3141c  ações principais, logo, preço do caixa
+ *   Iracema #b3141c  ações principais, logo, preços
  *   Broto   #2f7a3f  sucesso e gráficos (validado para série única)
  *   Laranja #e07a1f  estoque baixo (texto: #b45a0e)
- *   Limão   #f2c230  marca do item ativo na sidebar
+ *   Limão   #f5c518  a etiqueta de preço (total do caixa, estoque baixo) e o item ativo da sidebar
+ *   Papel   #fbfaf3  fundo; Palha #e6e0cc  bordas
  * Tema claro (padrão) e escuro (classe .dark, escolhida no rodapé da sidebar).
- * As cores da MARCA (selo, fundo do login) são iguais nos dois temas; as de
- * TEXTO (titulo, preco) e de estado mudam no escuro para manter o contraste.
+ * As cores da MARCA (selo, etiqueta, fundo do login) são iguais nos dois temas;
+ * as de TEXTO (titulo, preco) e de estado mudam no escuro para manter o contraste.
  */
 :root {
   --folha: #1f4a2c;
@@ -76,34 +81,36 @@
   --broto: #2f7a3f;
   --laranja: #e07a1f;
   --laranja-texto: #b45a0e;
-  --limao: #f2c230;
-  /* Texto: títulos em verde-folha, preço do caixa em vermelho Iracema. */
+  --limao: #f5c518;
+  /* Texto: títulos em verde-folha, preços em vermelho Iracema. */
   --titulo: #1f4a2c;
   --preco: #b3141c;
   /* Texto sobre fundo verde (selos "Entrada", "Enviado"). */
   --sobre-broto: #ffffff;
+  /* Texto sobre a etiqueta amarela: vermelho mais fundo (contraste 5,7:1). */
+  --sobre-limao: #8f0f16;
 
-  --background: #f6f7f3;
-  --foreground: #1c2420;
+  --background: #fbfaf3;
+  --foreground: #1d2a21;
   --card: #ffffff;
-  --card-foreground: #1c2420;
+  --card-foreground: #1d2a21;
   --popover: #ffffff;
-  --popover-foreground: #1c2420;
+  --popover-foreground: #1d2a21;
   --primary: var(--iracema);
   --primary-foreground: #ffffff;
-  --secondary: #e8efe6;
+  --secondary: #edf1e4;
   --secondary-foreground: #1f4a2c;
-  --muted: #eef1ec;
-  --muted-foreground: #5b6560;
-  --accent: #e8efe6;
+  --muted: #f3f0e4;
+  --muted-foreground: #5c6257;
+  --accent: #edf1e4;
   --accent-foreground: #1f4a2c;
   --destructive: #c2261e;
-  --border: #dde3da;
-  --input: #cfd7cc;
+  --border: #e6e0cc;
+  --input: #d6cfb6;
   --ring: #2f7a3f;
   --chart-1: var(--broto); /* série única dos gráficos (validada: dataviz) */
   --chart-2: #e07a1f;
-  --chart-3: #f2c230;
+  --chart-3: #f5c518;
   --chart-4: #1f4a2c;
   --chart-5: #b3141c;
   --radius: 0.5rem;
@@ -166,13 +173,31 @@
   }
 }
 /*
- * Números de destaque (totais, cards do painel): sans em negrito com
- * algarismos alinhados (mesma altura) e tabulares (mesma largura). A serifa
- * Zilla Slab fica só para títulos e logo: os algarismos dela variam de altura.
+ * Números de destaque (totais, preços, cards do painel): a condensada de
+ * letreiro, pesada, com algarismos alinhados e tabulares. Em tabelas e textos
+ * corridos os números continuam na sans (classe tabular-nums).
  */
 @utility numero {
-  font-family: var(--font-sans);
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-weight: 800;
   font-variant-numeric: lining-nums tabular-nums;
-  letter-spacing: -0.01em;
+  letter-spacing: 0.005em;
+}
+
+/*
+ * A plaquinha de preço da banca: amarela, com a ponta recortada à esquerda e
+ * um furo do barbante. Usada no total do caixa e no estoque baixo do painel.
+ * As cores são as da marca, iguais nos dois temas. O furo mostra a cor de
+ * --etiqueta-fundo (o card por baixo).
+ */
+@utility etiqueta {
+  --etiqueta-fundo: var(--card);
+  background:
+    radial-gradient(circle at 0.85rem 50%, var(--etiqueta-fundo) 0.2rem, transparent 0.23rem),
+    var(--limao);
+  color: var(--sobre-limao);
+  clip-path: polygon(0.9rem 0, 100% 0, 100% 100%, 0.9rem 100%, 0 50%);
+  border-radius: 0 0.4rem 0.4rem 0;
+  padding-left: 1.75rem;
+  padding-right: 1rem;
 }

@@ -72,7 +72,7 @@ export function ItensVenda({ itens, aoMudarQuantidade, aoRemover }: Props) {
               </Button>
             </div>
 
-            <span className="w-24 text-right font-semibold tabular-nums">
+            <span className="numero w-24 text-right text-xl text-preco">
               {formatarCentavos(subtotalCentavos(item))}
             </span>
 
