@@ -46,3 +46,6 @@ next-env.d.ts
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# graphify (mapa do código gerado localmente; tem caminhos desta máquina)
+/graphify-out/
