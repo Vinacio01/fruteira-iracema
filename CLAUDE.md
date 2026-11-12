@@ -50,6 +50,18 @@ Todo o código deste repositório é escrito pelo Claude Code. O desenvolvedor d
 - Não instale dependências fora da stack sem justificar.
 - Não desative mecanismos de segurança para facilitar o desenvolvimento.
 
+## Estado atual: em produção
+
+- As fases 0 a 8 terminaram. O app está **no ar** (Vercel + Supabase) e é usado como demonstração de portfólio. O que vier agora são melhorias sobre o que existe.
+- **Todo trabalho novo é local**: Supabase local (Docker) e commits locais. **Nunca** faça push, deploy ou comando contra o Supabase de produção; publicar é decisão do desenvolvedor, que faz isso ele mesmo. O `.claude/settings.json` bloqueia esses comandos.
+- **Migrations já commitadas não se editam** (já rodaram na produção): toda mudança de banco é uma migration nova. Um hook bloqueia a edição.
+- Recursos do Claude neste repositório (`.claude/`):
+  - skill `fechar-fase`: checklist de verificação, registro, commit e relatório ao fim de cada fase;
+  - skill `nova-migration`: como mudar o banco com segurança;
+  - skill `ambiente-local`: como subir Docker, Supabase local, usuários de teste e Mailpit no Windows;
+  - agente `revisor-seguranca`: revisão das regras de segurança antes de commitar mudanças em banco, autenticação ou permissões.
+- Decisões tomadas depois da especificação ficam em `docs/decisoes.md`; leia antes de mudar algo que já existe.
+
 ## Stack
 
 - **Next.js** (App Router, TypeScript, Server Components e Server Actions)
