@@ -17,8 +17,8 @@ export class Cenario {
   private produtos: string[] = [];
 
   /** Usuário com senha conhecida, para entrar pela tela de login. */
-  async usuario(papel: Papel) {
-    const email = `e2e-${papel}-${randomUUID().slice(0, 8)}@mercadinho.test`;
+  async usuario(papel: Papel, { dominio = "mercadinho.test" } = {}) {
+    const email = `e2e-${papel}-${randomUUID().slice(0, 8)}@${dominio}`;
     const senha = randomUUID();
     const { data, error } = await admin.auth.admin.createUser({
       email,

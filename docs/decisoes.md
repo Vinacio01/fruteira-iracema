@@ -198,6 +198,15 @@ O usuário achou o visual anterior feio. Entre três direções (etiqueta de fei
 - **Não abre sozinho com a loja vazia**: aí o assistente de configuração já está na tela, e os dois juntos atrapalhariam. O botão "Ver tour" continua disponível.
 - **Posição do balão**: abaixo do alvo quando cabe, senão acima; alvos na faixa da esquerda (o menu) recebem o balão **ao lado**, para não cobri-los; alvo escondido (o menu no celular) põe o balão no centro.
 
+## Minha conta: trocar a senha (pedido do usuário)
+
+- Escolhido "trocar senha estando logado" antes de "esqueci minha senha": a recuperação por e-mail depende do envio de e-mails do Supabase Auth (limite baixo no serviço padrão; para uso real, ligar ao Resend por SMTP) e fica para depois.
+- **Tela `/conta` para os dois papéis**, aberta pelo nome do usuário no rodapé do menu. Configurações continua só do proprietário.
+- **Exige a senha atual**: quem achar o computador com a sessão aberta não troca a senha. A senha atual é conferida numa **conexão à parte** (sem cookies), para não mexer na sessão aberta; a sessão criada por essa conferência é encerrada em seguida. A troca usa `auth.updateUser` com a sessão do usuário.
+- **Mínimo de 8 caracteres** (o mesmo do `supabase/config.toml`, validado também no servidor com Zod, para valer igual em produção) e no máximo 72 (limite do bcrypt).
+- **Contas da demonstração pública (`@demo-iracema.test`) não trocam a senha**: a senha delas está no README, e um visitante trancaria todos os outros do lado de fora. Bloqueado no servidor; a tela explica e desabilita o formulário.
+- Testes: validações no Vitest; troca completa (senha errada, confirmação diferente, troca, a antiga deixa de valer) e o bloqueio da demo nos testes de ponta a ponta.
+
 ## Histórico do estoque
 
 - **O histórico mostra a movimentação recém-registrada**: o botão "+ Estoque" da lista abre a tela filtrada no produto, e trocar o produto no formulário deixava a movimentação nova escondida pelo filtro antigo (parecia que saídas e ajustes não eram gravados). Agora, se o filtro de produto, tipo ou período a esconderia, ele passa a mostrar o produto que acabou de ser movimentado.

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { diaEmSaoPaulo, diaSeguinte, inicioDoDiaEmSaoPaulo } from "@/lib/format";
 import { contemTermos } from "@/lib/texto";
+import { esquemaTrocaSenha } from "@/lib/validations/auth";
 import { normalizarDinheiro } from "@/lib/validations/comum";
 import { esquemaMovimentacao } from "@/lib/validations/estoque";
 import { esquemaFiltrosProdutos, esquemaNovoProduto } from "@/lib/validations/produtos";
@@ -113,5 +114,33 @@ describe("contemTermos", () => {
   it("ignora acentos e ordem das palavras", () => {
     expect(contemTermos("Feijão Carioca 1 kg", "carioca feijao")).toBe(true);
     expect(contemTermos("Feijão Carioca 1 kg", "preto")).toBe(false);
+  });
+});
+
+describe("esquemaTrocaSenha", () => {
+  const base = { senha_atual: "senha-antiga", nova_senha: "senha-nova-123", confirmacao: "senha-nova-123" };
+  const campoComErro = (dados: typeof base) => {
+    const r = esquemaTrocaSenha.safeParse(dados);
+    return r.success ? null : r.error.issues[0]?.path[0];
+  };
+
+  it("aceita uma troca válida", () => {
+    expect(esquemaTrocaSenha.safeParse(base).success).toBe(true);
+  });
+
+  it("exige a senha atual", () => {
+    expect(campoComErro({ ...base, senha_atual: "" })).toBe("senha_atual");
+  });
+
+  it("exige pelo menos 8 caracteres na nova senha", () => {
+    expect(campoComErro({ ...base, nova_senha: "curta12", confirmacao: "curta12" })).toBe("nova_senha");
+  });
+
+  it("recusa confirmação diferente", () => {
+    expect(campoComErro({ ...base, confirmacao: "outra-coisa" })).toBe("confirmacao");
+  });
+
+  it("recusa nova senha igual à atual", () => {
+    expect(campoComErro({ ...base, nova_senha: "senha-antiga", confirmacao: "senha-antiga" })).toBe("nova_senha");
   });
 });

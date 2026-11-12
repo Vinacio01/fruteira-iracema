@@ -1,4 +1,5 @@
-import { LogOut } from "lucide-react";
+import Link from "next/link";
+import { LogOut, UserRound } from "lucide-react";
 
 import { sair } from "@/app/login/actions";
 import { AlternarTema } from "@/components/alternar-tema";
@@ -19,12 +20,18 @@ export function RodapeUsuario({ usuario }: Props) {
     <SidebarMenu>
       <AlternarTema />
       <SidebarMenuItem>
-        <div className="px-2 py-1.5 group-data-[collapsible=icon]:hidden">
-          <p className="truncate text-sm font-medium">{usuario.nome}</p>
-          <p className="truncate text-xs text-sidebar-foreground/70">
-            {ROTULO_PAPEL[usuario.papel]}
-          </p>
-        </div>
+        {/* Nome e papel levam a "Minha conta" (trocar senha). */}
+        <SidebarMenuButton asChild tooltip="Minha conta" className="h-auto py-1.5">
+          <Link href="/conta">
+            <UserRound />
+            <span className="min-w-0">
+              <span className="block truncate text-sm font-medium">{usuario.nome}</span>
+              <span className="block truncate text-xs text-sidebar-foreground/70">
+                {ROTULO_PAPEL[usuario.papel]} · Minha conta
+              </span>
+            </span>
+          </Link>
+        </SidebarMenuButton>
       </SidebarMenuItem>
       <SidebarMenuItem>
         <form action={sair}>
