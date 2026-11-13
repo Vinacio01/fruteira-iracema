@@ -35,11 +35,12 @@ jobs:
       - name: Tipos
         run: npm run typecheck
 
-      # Só os serviços que os testes usam: banco, Auth, API REST e o gateway.
+      # Só os serviços que os testes usam: banco, Auth, API REST, o gateway e o
+      # Mailpit (os testes de recuperar senha leem o e-mail nele, porta 54324).
       - name: Subir o Supabase local e aplicar as migrations
         run: >
           npx supabase start
-          -x realtime,storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+          -x realtime,storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
 
       - name: Variáveis do Supabase local para os testes
         run: |

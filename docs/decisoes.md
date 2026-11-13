@@ -225,3 +225,9 @@ Para quem não sabe a senha atual, "Minha conta" não ajuda: a recuperação é 
 - **Formulários sem `action={...}` direto**: o React limpa os campos de um formulário após a ação; como a tela de senha nova deve manter o que foi digitado quando há erro, o envio é feito por `onSubmit` + `startTransition` (igual a Minha conta).
 - Limitação conhecida: antivírus ou leitores de e-mail corporativos que "abrem" links para verificar podem gastar o link antes do usuário. Pedir outro resolve.
 - Testes: validações no Vitest; fluxo completo no Playwright lendo o e-mail no Mailpit do Supabase local (link, senha nova, antiga deixa de valer, link não vale duas vezes, e-mail desconhecido sem e-mail enviado, demo bloqueada, sessão comum recusada na tela de senha nova, link adulterado).
+
+## CI vermelho: Mailpit desligado
+
+- **Sintoma**: depois do "Esqueci minha senha", o CI do GitHub passou a falhar (X vermelho no commit) em 3 testes de ponta a ponta de `e2e/recuperar-senha.spec.ts`, com `ECONNREFUSED 127.0.0.1:54324`. O deploy na Vercel não foi afetado.
+- **Causa**: para subir mais rápido, o CI liga o Supabase com `-x` desligando serviços que os testes não usavam, e o Mailpit estava na lista. Os testes de recuperação de senha, que vieram depois, leem o e-mail no Mailpit. Na máquina de desenvolvimento ele fica ligado, por isso passavam localmente.
+- **Correção**: o Mailpit saiu da lista do `-x`. Ao criar um teste que dependa de outro serviço do Supabase local, conferir também a lista do CI.
